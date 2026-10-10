@@ -11,6 +11,8 @@ public class Jump : MonoBehaviour
     
     private void Update()
     {
+        if (rb.bodyType == RigidbodyType2D.Kinematic) return;
+        
         if (Input.GetKeyDown(KeyCode.J))
         {
             var grounded = groundCheck.IsGrounded();

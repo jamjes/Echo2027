@@ -30,6 +30,8 @@ public class AnimationHandler : MonoBehaviour
                 animator.enabled = true;
             }
         }
+
+        if (!animator.isActiveAndEnabled) return;
         
         var isGrounded = groundCheck.IsGrounded();
         

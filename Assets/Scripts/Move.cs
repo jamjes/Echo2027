@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Move : MonoBehaviour
@@ -8,7 +7,7 @@ public class Move : MonoBehaviour
 
     private void Update()
     {
-        if (rb.bodyType == RigidbodyType2D.Static) return;
+        if (rb.bodyType == RigidbodyType2D.Kinematic) return;
         
         if (Input.GetKey(KeyCode.A))
         {
