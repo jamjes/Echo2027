@@ -2,19 +2,23 @@ using UnityEngine;
 
 public class GroundCheck : MonoBehaviour
 {
-    [SerializeField] private Transform feetPos;
+    [SerializeField] private Transform feet;
     [SerializeField] private LayerMask groundLayer;
-    
+    [SerializeField] private float radius = .1f;
+
+    private void Awake()
+    {
+        if (feet == null) Debug.LogWarning($"{gameObject.name} GroundCheck: Feet position reference missing");
+    }
+
     public bool IsGrounded()
     {
-        var hit = Physics2D.CircleCast(
-            origin: feetPos.position, 
-            radius: .1f, 
-            direction: Vector2.zero,
-            distance: 0f, 
-            layerMask: groundLayer
+        if (!feet) return false;
+        
+        return Physics2D.OverlapCircle(
+            feet.position,
+            radius,
+            groundLayer
         );
-
-        return hit.collider;
     }
 }

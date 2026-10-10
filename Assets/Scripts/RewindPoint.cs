@@ -1,11 +1,10 @@
 using UnityEngine;
 
-[System.Serializable]
 public struct RewindPoint
 {
-    public Vector2 Position { get; private set; }
-    public Sprite Frame { get; private set; }
-    public bool FacingLeft { get; private set; }
+    public readonly Vector2 Position;
+    public readonly Sprite Frame;
+    public readonly bool FacingLeft;
     
     public RewindPoint(Vector2 position, Sprite frame, bool facingLeft)
     {

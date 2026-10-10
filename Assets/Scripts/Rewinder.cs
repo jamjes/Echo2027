@@ -3,62 +3,58 @@ using System.Collections.Generic;
 
 public class Rewinder : MonoBehaviour
 {
-    [SerializeField] private LinkedList<RewindPoint> rewindPointLinkedList;
+    private LinkedList<RewindPoint> rewindPointLinkedList;
     private float elapsedTime;
+    [SerializeField] private int frameRate = 60;
+    [SerializeField] private float rewindLength = 3f;
+    private float recordInterval;
+    private int rewindPointMaxLength;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
-    private Vector3 lastVelocity;
-
     private bool isRewinding = false;
-    
+    [SerializeField] private InputReader input;
+
+    private void OnEnable()
+    {
+        if (input == null) return;
+        
+        input.OnRewindStart += BeginRecall;
+        input.OnRewindEnd += EndRecall;
+    }
+
+    private void OnDisable()
+    {
+        if (input == null) return;
+        
+        input.OnRewindStart -= BeginRecall;
+        input.OnRewindEnd -= EndRecall;
+    }
+
     private void Awake()
     {
         rewindPointLinkedList = new LinkedList<RewindPoint>();
+        recordInterval = 1f / frameRate;
+        rewindPointMaxLength = (int)(rewindLength * frameRate);
+        
+        if (rb == null) Debug.LogWarning($"{gameObject.name} Rewinder: Rigidbody2D reference missing");
+        if (spriteRenderer == null) Debug.LogWarning($"{gameObject.name} Rewinder: SpriteRenderer reference missing");
     }
 
     private void FixedUpdate()
     {
-        if (isRewinding)
-        {
-            Recall();
-            return;
-        }
+        if (!rb || !spriteRenderer) return;
         
-        Record();
-    }
-
-    private void Update()
-    {
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            if (isRewinding == false)
-            {
-                rb.bodyType = RigidbodyType2D.Kinematic;
-                rb.gravityScale = 0;
-                rb.linearVelocity = Vector2.zero;
-            }
-            
-            isRewinding = true;
-        }
-        else
-        {
-            if (isRewinding)
-            {
-                rb.bodyType = RigidbodyType2D.Dynamic;
-                rb.gravityScale = 1;
-            }
-            
-            isRewinding = false;
-        }
+        if (isRewinding) Recall();
+        else Record();
     }
 
     private void Record()
     {
-        elapsedTime += Time.deltaTime;
+        elapsedTime += Time.fixedDeltaTime;
 
-        if (elapsedTime >= 1f / 60)
+        if (elapsedTime >= recordInterval)
         {
-            if (rewindPointLinkedList.Count == 60 * 3)
+            if (rewindPointLinkedList.Count == rewindPointMaxLength)
             {
                 rewindPointLinkedList.RemoveFirst();
             }
@@ -72,19 +68,39 @@ public class Rewinder : MonoBehaviour
     {
         if (rewindPointLinkedList.Count == 0) return;
         
-        elapsedTime -= Time.deltaTime;
+        elapsedTime -= Time.fixedDeltaTime;
 
         if (elapsedTime <= 0)
         {
             var lastRewindPoint = rewindPointLinkedList.Last.Value;
 
-            rb.MovePosition(lastRewindPoint.Position);
+            rb.position = lastRewindPoint.Position;
+            
             spriteRenderer.sprite = lastRewindPoint.Frame;
             spriteRenderer.flipX = lastRewindPoint.FacingLeft;
             
             rewindPointLinkedList.RemoveLast();
             
-            elapsedTime = 1f / 60;
+            elapsedTime = recordInterval;
         }
+    }
+
+    private void BeginRecall()
+    {
+        if (!rb) return;
+        
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.gravityScale = 0;
+        rb.linearVelocity = Vector2.zero;
+        isRewinding = true;
+    }
+
+    private void EndRecall()
+    {
+        if (!rb) return;
+        
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.gravityScale = 1;
+        isRewinding = false;
     }
 }
