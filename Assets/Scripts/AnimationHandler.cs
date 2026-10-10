@@ -62,7 +62,7 @@ public class AnimationHandler : MonoBehaviour
                 
                 animator.CrossFade(Run, 0, 0);
             }
-            if (rb.linearVelocityX == 0) animator.CrossFade(Idle, 0, 0);
+            else animator.CrossFade(Idle, 0, 0);
         }
     }
 
