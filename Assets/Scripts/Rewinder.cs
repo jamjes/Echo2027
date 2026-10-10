@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Rewinder : MonoBehaviour
 {
-    [SerializeField] private List<RewindPoint> timeline;
+    [SerializeField] private LinkedList<RewindPoint> rewindPointLinkedList;
     private float elapsedTime;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
@@ -13,7 +13,7 @@ public class Rewinder : MonoBehaviour
     
     private void Awake()
     {
-        timeline = new List<RewindPoint>();
+        rewindPointLinkedList = new LinkedList<RewindPoint>();
     }
 
     private void FixedUpdate()
@@ -58,31 +58,32 @@ public class Rewinder : MonoBehaviour
 
         if (elapsedTime >= 1f / 60)
         {
-            if (timeline.Count == 60 * 3)
+            if (rewindPointLinkedList.Count == 60 * 3)
             {
-                timeline.RemoveAt(0);
+                rewindPointLinkedList.RemoveFirst();
             }
             
-            timeline.Add(new RewindPoint(rb.position, spriteRenderer.sprite, spriteRenderer.flipX));
+            rewindPointLinkedList.AddLast(new RewindPoint(rb.position, spriteRenderer.sprite, spriteRenderer.flipX));
             elapsedTime = 0f;
         }
     }
 
     private void Recall()
     {
-        if (timeline.Count == 0) return;
+        if (rewindPointLinkedList.Count == 0) return;
         
         elapsedTime -= Time.deltaTime;
 
         if (elapsedTime <= 0)
         {
-            var lastRewindPoint = timeline[^1];
+            var lastRewindPoint = rewindPointLinkedList.Last.Value;
 
             rb.MovePosition(lastRewindPoint.Position);
             spriteRenderer.sprite = lastRewindPoint.Frame;
             spriteRenderer.flipX = lastRewindPoint.FacingLeft;
             
-            timeline.RemoveAt(timeline.Count - 1);
+            rewindPointLinkedList.RemoveLast();
+            
             elapsedTime = 1f / 60;
         }
     }
