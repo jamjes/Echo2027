@@ -6,6 +6,7 @@ public class Rewinder : MonoBehaviour
     [SerializeField] private List<RewindPoint> timeline;
     private float elapsedTime;
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private SpriteRenderer spriteRenderer;
     private Vector3 lastVelocity;
 
     private bool isRewinding = false;
@@ -34,6 +35,7 @@ public class Rewinder : MonoBehaviour
             {
                 rb.bodyType = RigidbodyType2D.Kinematic;
                 rb.gravityScale = 0;
+                rb.linearVelocity = Vector2.zero;
             }
             
             isRewinding = true;
@@ -44,12 +46,6 @@ public class Rewinder : MonoBehaviour
             {
                 rb.bodyType = RigidbodyType2D.Dynamic;
                 rb.gravityScale = 1;
-
-                if (timeline.Count == 1)
-                {
-                    rb.linearVelocity = timeline[0].Velocity;
-                    timeline.RemoveAt(0);
-                }
             }
             
             isRewinding = false;
@@ -67,7 +63,7 @@ public class Rewinder : MonoBehaviour
                 timeline.RemoveAt(0);
             }
             
-            timeline.Add(new RewindPoint(rb.position, rb.linearVelocity));
+            timeline.Add(new RewindPoint(rb.position, spriteRenderer.sprite, spriteRenderer.flipX));
             elapsedTime = 0f;
         }
     }
@@ -80,12 +76,11 @@ public class Rewinder : MonoBehaviour
 
         if (elapsedTime <= 0)
         {
-            var lastRewindPoint = timeline[timeline.Count - 1];
+            var lastRewindPoint = timeline[^1];
 
             rb.MovePosition(lastRewindPoint.Position);
-
-            if (timeline.Count == 1) rb.linearVelocity = Vector2.zero;
-            else rb.linearVelocity = lastRewindPoint.Velocity;
+            spriteRenderer.sprite = lastRewindPoint.Frame;
+            spriteRenderer.flipX = lastRewindPoint.FacingLeft;
             
             timeline.RemoveAt(timeline.Count - 1);
             elapsedTime = 1f / 60;

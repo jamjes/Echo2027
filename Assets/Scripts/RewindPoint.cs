@@ -4,11 +4,13 @@ using UnityEngine;
 public struct RewindPoint
 {
     public Vector2 Position { get; private set; }
-    public Vector2 Velocity { get; private set; }
+    public Sprite Frame { get; private set; }
+    public bool FacingLeft { get; private set; }
     
-    public RewindPoint(Vector2 position, Vector2 velocity)
+    public RewindPoint(Vector2 position, Sprite frame, bool facingLeft)
     {
         Position = position;
-        Velocity = velocity;
+        Frame = frame;
+        FacingLeft = facingLeft;
     }
 }
