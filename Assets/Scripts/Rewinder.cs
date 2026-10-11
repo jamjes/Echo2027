@@ -12,7 +12,7 @@ public class Rewinder : MonoBehaviour
     private int rewindPointMaxLength;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
-    private bool isRewinding = false;
+    public bool IsRewinding { get; private set; } = false;
     [SerializeField] private InputReader input;
 
     private void OnEnable()
@@ -50,7 +50,7 @@ public class Rewinder : MonoBehaviour
 
         if (!map.IsValid()) return;
         
-        if (isRewinding) Recall();
+        if (IsRewinding) Recall();
         else Record();
     }
 
@@ -104,7 +104,7 @@ public class Rewinder : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.gravityScale = 0;
         rb.linearVelocity = Vector2.zero;
-        isRewinding = true;
+        IsRewinding = true;
     }
 
     private void EndRecall()
@@ -113,6 +113,6 @@ public class Rewinder : MonoBehaviour
         
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.gravityScale = 1;
-        isRewinding = false;
+        IsRewinding = false;
     }
 }
