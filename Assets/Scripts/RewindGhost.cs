@@ -23,9 +23,9 @@ public class RewindGhost : MonoBehaviour
         if (furthestRewindPoint.IsEqual(rewindPoint)) return;
         
         transform.position = rewindPoint.Position;
-        spriteRenderer.sprite = rewindPoint.Frame;
+        spriteRenderer.sprite = rewindPoint.NormalFrame;
         spriteRenderer.flipX = rewindPoint.FacingLeft;
-
+        
         furthestRewindPoint = rewindPoint;
     }
 }

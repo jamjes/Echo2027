@@ -3879,6 +3879,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5da691d292154574080aa1d468550db1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rewinder
+  map: {fileID: 11400000, guid: b7645773f66c86543bf5f101b430e6fb, type: 2}
   frameRate: 60
   rewindLength: 3
   rb: {fileID: 1201724256}

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class Rewinder : MonoBehaviour
 {
     public LinkedList<RewindPoint> RewindPointLinkedList { get; private set; }
+    [SerializeField] private DualSpriteMap map;
     private float elapsedTime;
     [SerializeField] private int frameRate = 60;
     [SerializeField] private float rewindLength = 3f;
@@ -38,11 +39,16 @@ public class Rewinder : MonoBehaviour
         
         if (rb == null) Debug.LogWarning($"{gameObject.name} Rewinder: Rigidbody2D reference missing");
         if (spriteRenderer == null) Debug.LogWarning($"{gameObject.name} Rewinder: SpriteRenderer reference missing");
+        if (map == null) Debug.LogWarning($"{gameObject.name} Rewinder: Map reference missing");
     }
 
     private void FixedUpdate()
     {
         if (!rb || !spriteRenderer) return;
+
+        if (!map) return;
+
+        if (!map.IsValid()) return;
         
         if (isRewinding) Recall();
         else Record();
@@ -59,7 +65,13 @@ public class Rewinder : MonoBehaviour
                 RewindPointLinkedList.RemoveFirst();
             }
             
-            RewindPointLinkedList.AddLast(new RewindPoint(rb.position, spriteRenderer.sprite, spriteRenderer.flipX));
+            RewindPointLinkedList.AddLast(
+                new RewindPoint(rb.position, 
+                    spriteRenderer.sprite,
+                    map.GetAlternativeSprite(spriteRenderer.sprite), 
+                    spriteRenderer.flipX)
+                );
+            
             elapsedTime = 0f;
         }
     }
@@ -76,7 +88,7 @@ public class Rewinder : MonoBehaviour
 
             rb.position = lastRewindPoint.Position;
             
-            spriteRenderer.sprite = lastRewindPoint.Frame;
+            spriteRenderer.sprite = lastRewindPoint.AlternativeFrame;
             spriteRenderer.flipX = lastRewindPoint.FacingLeft;
             
             RewindPointLinkedList.RemoveLast();
