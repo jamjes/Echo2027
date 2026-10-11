@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Rewinder : MonoBehaviour
 {
-    private LinkedList<RewindPoint> rewindPointLinkedList;
+    public LinkedList<RewindPoint> RewindPointLinkedList { get; private set; }
     private float elapsedTime;
     [SerializeField] private int frameRate = 60;
     [SerializeField] private float rewindLength = 3f;
@@ -32,7 +32,7 @@ public class Rewinder : MonoBehaviour
 
     private void Awake()
     {
-        rewindPointLinkedList = new LinkedList<RewindPoint>();
+        RewindPointLinkedList = new LinkedList<RewindPoint>();
         recordInterval = 1f / frameRate;
         rewindPointMaxLength = (int)(rewindLength * frameRate);
         
@@ -54,32 +54,32 @@ public class Rewinder : MonoBehaviour
 
         if (elapsedTime >= recordInterval)
         {
-            if (rewindPointLinkedList.Count == rewindPointMaxLength)
+            if (RewindPointLinkedList.Count == rewindPointMaxLength)
             {
-                rewindPointLinkedList.RemoveFirst();
+                RewindPointLinkedList.RemoveFirst();
             }
             
-            rewindPointLinkedList.AddLast(new RewindPoint(rb.position, spriteRenderer.sprite, spriteRenderer.flipX));
+            RewindPointLinkedList.AddLast(new RewindPoint(rb.position, spriteRenderer.sprite, spriteRenderer.flipX));
             elapsedTime = 0f;
         }
     }
 
     private void Recall()
     {
-        if (rewindPointLinkedList.Count == 0) return;
+        if (RewindPointLinkedList.Count == 0) return;
         
         elapsedTime -= Time.fixedDeltaTime;
 
         if (elapsedTime <= 0)
         {
-            var lastRewindPoint = rewindPointLinkedList.Last.Value;
+            var lastRewindPoint = RewindPointLinkedList.Last.Value;
 
             rb.position = lastRewindPoint.Position;
             
             spriteRenderer.sprite = lastRewindPoint.Frame;
             spriteRenderer.flipX = lastRewindPoint.FacingLeft;
             
-            rewindPointLinkedList.RemoveLast();
+            RewindPointLinkedList.RemoveLast();
             
             elapsedTime = recordInterval;
         }

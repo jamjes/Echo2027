@@ -12,4 +12,12 @@ public struct RewindPoint
         Frame = frame;
         FacingLeft = facingLeft;
     }
+
+    public bool IsEqual(RewindPoint target)
+    {
+        return
+            Position == target.Position &&
+            Frame == target.Frame &&
+            FacingLeft == target.FacingLeft;
+    }
 }
